@@ -40,6 +40,18 @@ copy_exec /sbin/vconfig
 
 copy_exec /usr/sbin/sshd
 
+# Check if sshd-session exists and is executable, then copy it into the initramfs
+if [ -x /usr/lib/openssh/sshd-session ]; then
+    copy_exec /usr/lib/openssh/sshd-session
+fi
+# Ensure all important OpenSSH helper binaries are included in the initramfs
+for bin in sshd-session sshd-auth sshd-keygen; do
+	# If the binary exists and is executable, copy it into the initramfs
+    if [ -x "/usr/lib/openssh/$bin" ]; then
+        copy_exec "/usr/lib/openssh/$bin"
+    fi
+done
+
 # Copy SSH key files and configuration
 cp -a /etc/ssh/ "${DESTDIR}/etc/"
 
